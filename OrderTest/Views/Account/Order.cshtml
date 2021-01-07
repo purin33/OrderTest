@@ -1,0 +1,119 @@
+﻿@model List<OrderTest.Models.AccountViewModel>
+@{
+    ViewBag.Title = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>
+    Order List
+</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Order Id</th>
+            <th>Order Item</th>
+            <th>Price</th>
+            <th>Cost</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr>
+                <td colspan="6" class="text-center">尚無資料</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var i in Model)
+            {
+                <tr>
+                    <td>
+                        @if (i.Status == "0")
+                        {
+                            <input type="checkbox" value="@i.OrderId" class="orderBtn">
+                        }
+                        else
+                        {
+                            <input type="checkbox" checked disabled>
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(m => i.OrderId)</td>
+                    <td>
+                        <span data-toggle="modal" data-target="#exampleModal">
+                            @Ajax.ActionLink(i.OrderItem, "ProductDetail", "Account", new { OrderItem = i.OrderItem }, new AjaxOptions { UpdateTargetId = "orderbody" })
+                        </span>
+                    </td>
+                    <td>@Html.DisplayFor(m => i.Price)</td>
+                    <td>@Html.DisplayFor(m => i.Cost)</td>
+                    <td>@Html.DisplayFor(m => i.StatusText)</td>
+                </tr>
+            }
+
+            <tr>
+                <td colspan="6">
+                    <input type="button" value="Confirm" class="btn btn-primary" id="orderSubmit"/>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="orderbody"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @*<button type="button" class="btn btn-primary">Save changes</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+        $("#orderSubmit").click(function () {
+            var mRet = "";
+            $(".orderBtn").each(function () {
+                if ($(this).is(":checked")) {
+                    mRet += (mRet != "" ? "," : "") + $(this).val();
+                }
+            })
+
+            if (mRet == "") {
+                alert("請選擇項目");
+            } else {
+                $.ajax({
+                    url: '@Url.Action("ChangeStatus", "Account")',
+                    data: { OrderID: mRet },
+                    type: 'post',
+                    cache: false,
+                    async: false,
+                    //dataType: 'json',
+                    success: function (data) {
+                        alert(data);
+                        location.reload();
+                    }
+                });
+            }
+
+
+
+        })
+
+
+    })
+</script>

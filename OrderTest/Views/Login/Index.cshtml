@@ -1,0 +1,44 @@
+﻿@model OrderTest.Models.LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.login = true;
+}
+
+<h2>登入</h2>
+
+@using (Ajax.BeginForm("Check", "Login", new AjaxOptions { OnSuccess = "loginOnSuccess" }, new { id = "login-form" }))
+{
+    <div>
+        @Html.TextBoxFor(m => m.ID, new { @class = "form-control", required = "required", placeholder = "帳號" })
+    </div>
+    <div style="margin-top:20px;">
+        @Html.PasswordFor(m => m.PW, new { @class = "form-control", required = "required", placeholder = "密碼" })
+    </div>
+}
+
+<div style="margin-top:20px;">
+    <input type="button" class="btn btn-success" value="登入" id="loginBtn" />
+</div>
+
+<script>
+    $(function () {
+        $("#loginBtn").click(function () {
+            if ($("#login-form").valid()) {
+                $("#login-form").submit();
+            }
+        })
+
+
+    })
+
+    function loginOnSuccess(data) {
+        if (data == "成功") {
+            window.location.href = "@Url.Action("Order", "Account")";
+        } else {
+            alert(data);
+        }
+
+    }
+
+</script>
